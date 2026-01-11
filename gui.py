@@ -245,3 +245,43 @@ class FinanceApp:
         status_bar = ttk.Label(self.root, textvariable=self.status_var,
                                relief="sunken", anchor="w")
         status_bar.grid(row=2, column=0, columnspan=2, sticky="ew", padx=10, pady=5)
+
+    def delete_selected(self):
+        selection = self.tree.selection()
+        if not selection:
+            messagebox.showwarning("Внимание", "Выберите операцию для удаления")
+            return
+
+        selected_item = self.tree.item(selection[0])
+        operation_id = int(selected_item['values'][0])
+
+        if not messagebox.askyesno("Подтверждение",
+                                   f"Удалить операцию #{operation_id}?\n"
+                                   f"{selected_item['values'][1]} - "
+                                   f"{selected_item['values'][3]}: "
+                                   f"{selected_item['values'][4]} руб."):
+            return
+
+        try:
+            if self.storage.delete_operation(operation_id):
+                self.operations = [op for op in self.operations if op.id != operation_id]
+                self.refresh_operations_list()
+                self.update_status_bar()
+                messagebox.showinfo("Успех", f"Операция #{operation_id} удалена")
+            else:
+                messagebox.showerror("Ошибка", "Не удалось удалить операцию")
+        except Exception as e:
+            messagebox.showerror("Ошибка", f"Ошибка при удалении: {str(e)}")
+
+    def update_status_bar(self):
+        balance = self.calculate_balance()
+        self.status_var.set(
+            f"Операций: {len(self.operations)} | "
+            f"Баланс: {balance:.2f} руб. | "
+            f"Используется: CSV хранилище"
+        )
+
+    def calculate_balance(self) -> float:
+        income = sum(op.amount for op in self.operations if op.type == 'income')
+        expense = sum(op.amount for op in self.operations if op.type == 'expense')
+        return income - expense

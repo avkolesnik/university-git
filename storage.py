@@ -87,3 +87,79 @@ class CSVStorage(Storage):
             if key == 'date_to' and operation.date > value:
                 return False
         return True
+
+    def delete_operation(self, operation_id: int) -> bool:
+        try:
+            operations = self.get_operations()
+
+            operation_to_delete = None
+            filtered_operations = []
+
+            for op in operations:
+                if op.id == operation_id:
+                    operation_to_delete = op
+                else:
+                    filtered_operations.append(op)
+
+            if operation_to_delete is None:
+                print(f"Операция с ID {operation_id} не найдена")
+                return False
+
+            with open(self.filename, 'w', newline='', encoding='utf-8') as f:
+                writer = csv.writer(f)
+                writer.writerow(['id', 'amount', 'category', 'date',
+                                 'description', 'type'])
+
+                for op in filtered_operations:
+                    writer.writerow([
+                        op.id,
+                        op.amount,
+                        op.category,
+                        op.date.isoformat(),
+                        op.description or '',
+                        op.type
+                    ])
+
+            print(f"Операция {operation_id} удалена")
+            return True
+
+        except Exception as e:
+            print(f"Ошибка при удалении операции: {e}")
+            return False
+
+    def update_operation(self, operation: Operation) -> bool:
+        try:
+            operations = self.get_operations()
+            updated = False
+
+            for i, op in enumerate(operations):
+                if op.id == operation.id:
+                    operations[i] = operation
+                    updated = True
+                    break
+
+            if not updated:
+                print(f"Операция с ID {operation.id} не найдена для обновления")
+                return False
+
+            with open(self.filename, 'w', newline='', encoding='utf-8') as f:
+                writer = csv.writer(f)
+                writer.writerow(['id', 'amount', 'category', 'date',
+                                 'description', 'type'])
+
+                for op in operations:
+                    writer.writerow([
+                        op.id,
+                        op.amount,
+                        op.category,
+                        op.date.isoformat(),
+                        op.description or '',
+                        op.type
+                    ])
+
+            print(f"Операция {operation.id} обновлена")
+            return True
+
+        except Exception as e:
+            print(f"Ошибка при обновлении операции: {e}")
+            return False
