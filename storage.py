@@ -163,3 +163,68 @@ class CSVStorage(Storage):
         except Exception as e:
             print(f"Ошибка при обновлении операции: {e}")
             return False
+
+
+def export_to_csv(self, filename: str, operations: List[Operation] = None) -> bool:
+    try:
+        if operations is None:
+            operations = self.get_operations()
+
+        with open(filename, 'w', newline='', encoding='utf-8-sig') as f:
+            writer = csv.writer(f, delimiter=';')
+
+            writer.writerow([
+                'ID', 'Дата', 'Тип', 'Категория', 'Сумма',
+                'Описание', 'Год', 'Месяц', 'День недели'
+            ])
+
+            for op in operations:
+                type_russian = 'Доход' if op.type == 'income' else 'Расход'
+
+                weekdays = ['Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб', 'Вс']
+                day_of_week = weekdays[op.date.weekday()]
+
+                writer.writerow([
+                    op.id,
+                    op.date.strftime("%d.%m.%Y"),
+                    type_russian,
+                    op.category,
+                    f"{op.amount:.2f}".replace('.', ','),  # Запятая для десятичных
+                    op.description or '',
+                    op.date.year,
+                    op.date.month,
+                    day_of_week
+                ])
+
+        print(f"Экспортировано {len(operations)} операций в {filename}")
+        return True
+
+    except Exception as e:
+        print(f"Ошибка при экспорте: {e}")
+        return False
+
+
+def export_simple_csv(self, filename: str, operations: List[Operation] = None) -> bool:
+    try:
+        if operations is None:
+            operations = self.get_operations()
+
+        with open(filename, 'w', newline='', encoding='utf-8') as f:
+            writer = csv.writer(f)
+            writer.writerow(['id', 'amount', 'category', 'date',
+                             'description', 'type'])
+
+            for op in operations:
+                writer.writerow([
+                    op.id,
+                    op.amount,
+                    op.category,
+                    op.date.isoformat(),
+                    op.description or '',
+                    op.type
+                ])
+
+        return True
+    except Exception as e:
+        print(f"Ошибка при экспорте: {e}")
+        return False
