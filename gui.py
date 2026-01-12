@@ -88,7 +88,7 @@ def _write_excel_csv(filename: str, operations: List[Operation], title: str = ""
         if title:
             writer.writerow([f"# {title}"])
             writer.writerow([f"# Дата экспорта: {datetime.now().strftime('%d.%m.%Y %H:%M:%S')}"])
-            writer.writerow([])  # Пустая строка
+            writer.writerow([])
 
         writer.writerow([
             'ID', 'Дата', 'День недели', 'Тип операции',
@@ -239,8 +239,6 @@ class FinanceApp:
                    command=self.delete_selected).pack(side="left", padx=5)
         ttk.Button(btn_frame, text="Экспорт в CSV",
                    command=self.export_csv).pack(side="left", padx=5)
-        ttk.Button(btn_frame, text="Импорт из CSV",
-                   command=self.import_csv).pack(side="left", padx=5)
 
         frame.rowconfigure(0, weight=1)
         frame.columnconfigure(0, weight=1)
@@ -250,7 +248,7 @@ class FinanceApp:
         for item in self.tree.get_children():
             self.tree.delete(item)
 
-        for op in reversed(self.operations[-100:]):  # Показываем последние 100
+        for op in reversed(self.operations[-100:]):
             self.tree.insert("", "end", values=(
                 op.id,
                 op.date.strftime("%d.%m.%Y"),
@@ -507,7 +505,6 @@ class FinanceApp:
 
             format_dialog.destroy()
 
-        # Кнопки
         btn_frame = tk.Frame(format_dialog)
         btn_frame.pack(pady=20)
 

@@ -189,7 +189,7 @@ def export_to_csv(self, filename: str, operations: List[Operation] = None) -> bo
                     op.date.strftime("%d.%m.%Y"),
                     type_russian,
                     op.category,
-                    f"{op.amount:.2f}".replace('.', ','),  # Запятая для десятичных
+                    f"{op.amount:.2f}".replace('.', ','),
                     op.description or '',
                     op.date.year,
                     op.date.month,
