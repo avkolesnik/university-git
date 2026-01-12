@@ -540,4 +540,3 @@ class FinanceApp:
         else:
             _write_excel_csv(filename, operations, "Финансовые операции")
             messagebox.showinfo("Успех", f"Файл сохранен:\n{filename}")
-
